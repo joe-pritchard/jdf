@@ -94,6 +94,22 @@ class Manager
     }
 
     /**
+     * Send multiple files at once (calls sendFile)
+     *
+     * @param array $files
+     *
+     * @return Manager
+     */
+    public function sendFiles(array $files): Manager
+    {
+        foreach ($files as $filename) {
+            $this->sendFile($filename);
+        }
+
+        return $this;
+    }
+
+    /**
      * Store the target workflow to send files to.
      * Multiple workflows can be selected, just call this method again!
      *
