@@ -19,7 +19,6 @@
   "require": {
     "php": "^7.0",
     "ext-curl": "*",
-    "roave/security-advisories": "dev-master",
     "laravel/laravel": "^5.5",
     "illuminate/support": "*"
   },
