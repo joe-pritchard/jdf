@@ -2,9 +2,9 @@
   "name": "joe-pritchard/jdf",
   "description": "A Simple package for creating JDF files and sending them via JMF",
   "type": "library",
-  "keywords": ["jdf", "jmf", "digital print"],
+  "keywords": ["jdf", "jmf", "digital print", "laravel-5-package"],
   "homepage": "https://github.com/joe-pritchard/jdf",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "authors": [
     {
       "name": "Joe Pritchard",
