@@ -81,10 +81,16 @@ class BaseJDF
         $root->addAttribute('SenderID', $this->sender_id);
         $root->addAttribute('Version', $version);
 
-        $this->root = $root;
-
         // Register the namespace.
-        $this->root->registerXPathNamespace('xsi', $xmlns_xsi);
+        $root->registerXPathNamespace('xsi', $xmlns_xsi);
+
+        // add type attributes to JDF
+        if ($type === 'JDF') {
+            $root->addAttribute('Type', 'Combined');
+            $root->addAttribute('Types', 'DigitalPrinting');
+        }
+
+        $this->root = $root;
     }
 
     /**
@@ -117,5 +123,29 @@ class BaseJDF
         // return the node if it exists, or create a new one (so only ever one allowed)
         $child_node = $this->root->$node_type ?? $this->root->addChild($node_type);
         return $child_node;
+    }
+
+    /**
+     * Format the path to a print file so it will work as a reference in a JDF file or JMF message
+     *
+     * @param string $file_name
+     *
+     * @return string
+     */
+    public function formatPrintFilePath(string $file_name): string
+    {
+        $remote_path = $file_name;
+
+        if (!Str::startsWith($remote_path, ['http://', 'https://'])) {
+            // this must be a local file, make it relative to the JMF server
+
+            // strip off the leading file protocol string if present
+            $remote_path = Str::after($remote_path, 'file:///');
+
+            // prepend the file protocol and JMF server's base file path
+            $remote_path = 'file:///' . $this->server_file_path . $remote_path;
+        }
+
+        return $remote_path;
     }
 }
