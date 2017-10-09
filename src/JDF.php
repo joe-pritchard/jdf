@@ -61,7 +61,7 @@ class JDF extends BaseJDF
 
         // create a link element for this resource
         $resource_link = $this->resourceLinkPool()->addChild($resource_name . 'Link');
-        $resource_link->addAttribute('rRef', (string)$this->resourcePool()->$resource_name->attributes()->ID);
+        $resource_link->addAttribute('rRef', (string)$this->resourcePool()->$resource_name[0]->attributes()->ID);
         $resource_link->addAttribute('Usage', $usage);
 
         foreach ($attributes as $name => $value) {
@@ -98,35 +98,50 @@ class JDF extends BaseJDF
      */
     public function addPrintFile(string $file_name, int $quantity, string $item_id = '')
     {
-        $run_id      = $item_id === '' ? '1' : $item_id;
-        $run_list_id = 'R' . $item_id;
+        // add a layout element and filespec for this document within the ResourcePool
+        $layout_element    = $this->resourcePool()->LayoutElement;
+        $file_path_for_jdf = $this->formatPrintFilePath('MAX Default Source File Location/Doppelganger_Pdfs/' . $file_name);
 
-        // so it must have Type and Types attributes
-        $this->root->addAttribute('Type', 'Combined'); // we might have several run lists in one jdf file, say if one order contains multiple items
-        $this->root->addAttribute('Types', 'DigitalPrinting'); // in future could you do finishing and stuff here? Check the spec
+        if ($layout_element !== null) {
+            // there are already LayoutElements, so check if one exists with a URL attribute equal to the file_name we're adding
+            foreach ($this->resourcePool()->LayoutElement as $layout_element) {
+                if ($layout_element->FileSpec->attributes()->URL === $file_path_for_jdf) {
+                    // we found it :)
+                    break;
+                }
+            }
+        }
 
-        // one run list for each pdf file
-        $run_list    = $this->ResourcePool()->addChild('RunList');
-        $run_list->addAttribute('ID', $run_list_id);
+        if ($layout_element->asXML() === false) {
+            // we did not find a matching LayoutElement (or there wasn't one in the first place), so create a new one
+            $layout_element = $this->resourcePool()->addChild('LayoutElement');
+            $layout_element->addAttribute('Class', 'Parameter');
+            $layout_element->addAttribute('ID', $item_id === '' ? 'LE' . count($this->resourcePool()->LayoutElement) : 'Item' . $item_id);
+            $layout_element->addAttribute('Status', 'Available');
 
-        $run = $run_list->addChild('RunList');
-        $run->addAttribute('Run', "1");
+            $file_spec = $layout_element->addChild('FileSpec');
+            $file_spec->addAttribute('URL', $file_path_for_jdf);
+        }
 
-        $file_spec = $run->addChild('LayoutElement')->addChild('FileSpec');
-        $file_spec->addAttribute('MimeType', 'application/pdf');
-        $file_spec->addAttribute('URL', $this->server_file_path . $file_name);
+        $run_list = $this->resourcePool()->RunList;
+        if ($run_list->asXML() === false) {
+            $run_list = $this->resourcePool()->addChild('RunList');
+            $run_list->addAttribute('ID', 'RunListID');
+        }
 
-        // add the quantity as a component node
-        $quantity_element = $this->ResourcePool()->addChild('Component');
-        $quantity_element->addAttribute('Class', 'Quantity');
-        $quantity_element->addAttribute('ComponentType', 'FinalProduct');
-        $quantity_element->addAttribute('ID', 'Q1');
+        // add a link to the file we just created a layout element for, within its own RunList (inside the parent RunList)
+        for ($index = 0; $index < $quantity; $index++) {
+            echo 'Adding a runlist element for print ' . ($index + 1) . 'of ' . $quantity . PHP_EOL;
+            $child_run_list = $run_list->addChild('RunList');
+            $ref = $child_run_list->addChild('LayoutElementRef');
+            $ref->addAttribute('rRef', (string)$layout_element->attributes()->ID);
+        }
 
-        // now we need to reference our RunList and Component in ResourceLinkPool
-        $this->linkResource('RunList', 'Input');
-        $this->linkResource('Component', 'Output', ['Amount' => $quantity]);
+        // now we need to reference our RunList in ResourceLinkPool
+        if ($this->ResourceLinkPool()->RunListLink->asXML() === false) {
+            $this->linkResource('RunList', 'Input', ['CombinedProcessIndex' => '0 4']);
+        }
 
         return $this;
     }
-
 }
