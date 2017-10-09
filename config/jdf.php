@@ -13,19 +13,19 @@ return [
     | override this by sending $url in the JMF::submitMessage() method
     */
 
-    'server_url' => 'http://94.173.170.98:7751/',
+    'server_url' => '',
 
     /*
     |--------------------------------------------------------------------------
     | JMF Server File Path
     |--------------------------------------------------------------------------
     |
-    | This is the path which we will prepend to files to referenced in our jdf
-    | files. This value is used in the JDF::addPrintFile() method, with the
+    | This is prepended to files referenced in our jdf files or our JMF message
+    | This value is used in the addPrintFile() and SubmitQueueEntry, with the
     | assumption that the JMF server will find the files somewhere local
     */
 
-    'server_file_path' => 'C:/Xerox/Freeflow/Core/Data/MAX Default Source File Location/Doppelganger_Pdfs/',
+    'server_file_path' => '',
 
     /*
     |--------------------------------------------------------------------------
@@ -37,5 +37,5 @@ return [
     | use your applications name (the one in your config's app.name key)
     */
 
-    //'sender_id' => '',
+    'sender_id' => '',
 ];
