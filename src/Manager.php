@@ -77,15 +77,10 @@ class Manager
      *
      * @return $this
      */
-    public function sendFile(string $filename): Manager
+    public function sendJDFFile(string $filename): Manager
     {
         if (!Str::endsWith($filename, '.jdf')) {
             throw new \InvalidArgumentException('Please only send JDF files to the JMF server');
-        }
-
-        if (!filter_var($filename, FILTER_VALIDATE_URL)) {
-            // If we're not sending a URL to the JMF server, then we want to make sure we're sending a file resource to it
-            $filename = Str::start($filename, 'file:///');
         }
 
         $this->files_to_send->push($filename);
@@ -94,16 +89,16 @@ class Manager
     }
 
     /**
-     * Send multiple files at once (calls sendFile)
+     * Send multiple files at once (calls sendJDFFile)
      *
      * @param array $files
      *
      * @return Manager
      */
-    public function sendFiles(array $files): Manager
+    public function sendJDFFiles(array $files): Manager
     {
         foreach ($files as $filename) {
-            $this->sendFile($filename);
+            $this->sendJDFFile($filename);
         }
 
         return $this;
@@ -184,7 +179,7 @@ class Manager
         $jmf->command()->addAttribute('Type', 'SubmitQueueEntry');
         $jmf->command()->addAttribute('xsi:type', 'CommandSubmitQueueEntry', 'xsi');
         $jmf->command()->addAttribute('ID', Str::random());
-        $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('URL', $file_url);
+        $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
 
         $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
 
