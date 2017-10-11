@@ -169,7 +169,6 @@ class Manager
      * @param string     $file_url  This is the url of the JDF file to send to Core
      * @param Collection $workflow  This is the workflow object, whose URL will be used in our submission
      *
-     * @throws JMFSubmissionException
      */
     private function submitQueueEntry(string $file_url, Collection $workflow): void
     {
@@ -182,10 +181,5 @@ class Manager
         $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
 
         $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
-
-        if ((int)$response->attributes()->ReturnCode > 0) {
-            dump($response->asXML());
-            throw new JMFSubmissionException((string)$response->Notification->Comment);
-        }
     }
 }
