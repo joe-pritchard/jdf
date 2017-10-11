@@ -110,6 +110,7 @@ class BaseJDF
      * @param $arguments
      *
      * @return SimpleXMLElement|SimpleXMLElement[]
+     * @throws \BadMethodCallException
      */
     public function __call($method, $arguments): SimpleXMLElement
     {
