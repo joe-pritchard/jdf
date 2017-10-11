@@ -12,9 +12,6 @@ declare(strict_types=1);
 
 namespace JoePritchard\JDF;
 
-
-use SimpleXMLElement;
-
 /**
  * Class JDF
  *
@@ -99,20 +96,22 @@ class JDF extends BaseJDF
     public function addPrintFile(string $file_name, int $quantity, string $item_id = '')
     {
         // add a layout element and filespec for this document within the ResourcePool
-        $layout_element    = $this->resourcePool()->LayoutElement;
-        $file_path_for_jdf = $this->formatPrintFilePath('MAX Default Source File Location/Doppelganger_Pdfs/' . $file_name);
+        $found_layout_element = false;
+        $layout_element       = $this->resourcePool()->LayoutElement;
+        $file_path_for_jdf    = $this->formatPrintFilePath('MAX Default Source File Location/Doppelganger_Pdfs/' . $file_name);
 
-        if ($layout_element !== null) {
+        if ($layout_element->asXML() !== false) {
             // there are already LayoutElements, so check if one exists with a URL attribute equal to the file_name we're adding
             foreach ($this->resourcePool()->LayoutElement as $layout_element) {
                 if ($layout_element->FileSpec->attributes()->URL === $file_path_for_jdf) {
                     // we found it :)
+                    $found_layout_element = true;
                     break;
                 }
             }
         }
 
-        if ($layout_element->asXML() === false) {
+        if (!$found_layout_element) {
             // we did not find a matching LayoutElement (or there wasn't one in the first place), so create a new one
             $layout_element = $this->resourcePool()->addChild('LayoutElement');
             $layout_element->addAttribute('Class', 'Parameter');
