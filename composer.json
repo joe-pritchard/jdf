@@ -29,7 +29,7 @@
   "extra": {
     "laravel": {
       "providers": [
-        "JoePritchard\\JDF\\ServiceProvider"
+        "JoePritchard\\JDF\\Providers\\ServiceProvider"
       ]
     }
   }
