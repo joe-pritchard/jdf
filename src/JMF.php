@@ -14,6 +14,7 @@ namespace JoePritchard\JDF;
 
 use Illuminate\Support\Str;
 use JoePritchard\JDF\Exceptions\JMFResponseException;
+use JoePritchard\JDF\Exceptions\JMFReturnCodeException;
 use JoePritchard\JDF\Exceptions\JMFSubmissionException;
 use SimpleXMLElement;
 
@@ -55,6 +56,8 @@ class JMF extends BaseJDF
      *
      * @return SimpleXMLElement
      * @throws JMFSubmissionException
+     * @throws JMFResponseException
+     * @throws JMFReturnCodeException
      */
     public function submitMessage($url = null): SimpleXMLElement
     {
@@ -69,9 +72,6 @@ class JMF extends BaseJDF
         // use the url provided to us, or alternatively the base JMF server url
         $target = $url ?? $this->server_url;
 
-        // replace the server's local IP address with
-        $target = Str::replaceFirst('http://192.168.0.47:7751/', $this->server_url, $target);
-
         // ready to send the message... if it is a SubmitQueueEntry there will be a QueueSubmissionParams element with a URL attribute
         // if the URL attribute starts with cid://, then we're going to have to construct a MIME Package
         $payload = $this->root->asXML();
@@ -79,7 +79,7 @@ class JMF extends BaseJDF
         if ($this->root->Command !== null && $this->root->Command->QueueSubmissionParams !== null) {
             $file_url = $this->root->Command->QueueSubmissionParams->attributes()->URL;
 
-            if (Str::startsWith($file_url, 'cid:/')) {
+            if (Str::startsWith($file_url, 'cid://')) {
                 $payload = $this->makeMimePackage();
             }
         }
@@ -107,8 +107,8 @@ class JMF extends BaseJDF
             throw new JMFResponseException('The JMF server responded with Invalid XML: ' . $raw_result);
         }
 
-        if ((int) $result->attributes['ReturnCode'] > 0) {
-            throw new JMFSubmissionException($result->asXML());
+        if ((int)$result->attributes()->ReturnCode > 0) {
+            throw new JMFReturnCodeException((string)$result->Notification->Comment);
         }
 
         return $result->Response;
