@@ -3,7 +3,7 @@ declare(strict_types=1);
 /**
  * JMFReturnCodeException
  *
- * @project  Artery
+ * @project  JDF
  * @category JoePritchard\JDF
  * @author   joe
  *

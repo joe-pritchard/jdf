@@ -72,17 +72,21 @@ class JMF extends BaseJDF
         // use the url provided to us, or alternatively the base JMF server url
         $target = $url ?? $this->server_url;
 
-        // ready to send the message... if it is a SubmitQueueEntry there will be a QueueSubmissionParams element with a URL attribute
-        // if the URL attribute starts with cid://, then we're going to have to construct a MIME Package
         $payload = $this->root->asXML();
 
+        // ready to send the message... if it is a SubmitQueueEntry there will be a QueueSubmissionParams element with a URL attribute
+        // if the URL attribute starts with cid://, then we're going to have to construct a MIME Package
         if ($this->root->Command !== null && $this->root->Command->QueueSubmissionParams !== null) {
             $file_url = $this->root->Command->QueueSubmissionParams->attributes()->URL;
 
             if (Str::startsWith($file_url, 'cid://')) {
                 $payload = $this->makeMimePackage();
             }
+            // add a ReturnJMF so we can find out how things went
+            $this->root->Command->QueueSubmissionParams->addAttribute('ReturnJMF', route('joe-pritchard.return-jmf'));
+
         }
+
 
         $curl_handle = curl_init($target);
         curl_setopt($curl_handle, CURLOPT_POST, 1);

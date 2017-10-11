@@ -130,7 +130,6 @@ class JDF extends BaseJDF
 
         // add a link to the file we just created a layout element for, within its own RunList (inside the parent RunList)
         for ($index = 0; $index < $quantity; $index++) {
-            echo 'Adding a runlist element for print ' . ($index + 1) . 'of ' . $quantity . PHP_EOL;
             $child_run_list = $run_list->addChild('RunList');
             $ref = $child_run_list->addChild('LayoutElementRef');
             $ref->addAttribute('rRef', (string)$layout_element->attributes()->ID);
