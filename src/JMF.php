@@ -108,6 +108,7 @@ class JMF extends BaseJDF
 
         $this->initialiseMessage('JMF');
 
+        Log::debug($payload);
         if ($raw_result === false) {
             throw new JMFSubmissionException('Failed to communicate with the JMF server');
         }
@@ -116,11 +117,10 @@ class JMF extends BaseJDF
         } catch (\Exception $exception) {
             throw new JMFResponseException('The JMF server responded with Invalid XML: ' . $raw_result);
         }
-        if ((int)$result->attributes()->ReturnCode > 0) {
+        if ((int)$result->Response->attributes()->ReturnCode > 0) {
             throw new JMFReturnCodeException((string)$result->Notification->Comment);
         }
 
-        Log::debug($payload);
         Log::debug($result->Response->asXML());
 
         return $result->Response;
