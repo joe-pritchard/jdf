@@ -24,12 +24,12 @@ class JMFEntrySubmitted
     /**
      * @var \SimpleXMLElement
      */
-    private $jmf_request;
+    public $jmf_request;
 
     /**
      * @var \SimpleXMLElement
      */
-    private $jmf_response;
+    public $jmf_response;
 
     public function __construct(\SimpleXMLElement $jmf_request, \SimpleXMLElement $jmf_response)
     {
