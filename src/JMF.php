@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace JoePritchard\JDF;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use JoePritchard\JDF\Exceptions\JMFResponseException;
 use JoePritchard\JDF\Exceptions\JMFReturnCodeException;
@@ -66,27 +68,32 @@ class JMF extends BaseJDF
             throw new \RuntimeException("cURL must be installed to send JMF messages.");
         }
 
+        // use the url provided to us, or alternatively the base JMF server url
+        $target = $url ?? $this->server_url;
+
         // add a timestamp to this message
         $this->root->addAttribute('TimeStamp', \Carbon\Carbon::now()->toIso8601String());
 
-        // use the url provided to us, or alternatively the base JMF server url
-        $target = $url ?? $this->server_url;
+        // add the ID attribute to the command or query
+        $message_id = Hash::make(time());
+        if ($this->root->Command->asXML() !== false) {
+            $this->command()->addAttribute('ID', $message_id);
+        }
+        if ($this->root->Query->asXML() !== false) {
+            $this->query()->addAttribute('ID', $message_id);
+        }
 
         $payload = $this->root->asXML();
 
         // ready to send the message... if it is a SubmitQueueEntry there will be a QueueSubmissionParams element with a URL attribute
-        // if the URL attribute starts with cid://, then we're going to have to construct a MIME Package
-        if ($this->root->Command !== null && $this->root->Command->QueueSubmissionParams !== null) {
+        if ($this->root->Command->asXML() !== False && (string)$this->root->Command->attributes()->Type === 'SubmitQueueEntry') {
             $file_url = $this->root->Command->QueueSubmissionParams->attributes()->URL;
 
+            // if the URL attribute starts with cid://, then we're going to have to construct a MIME Package
             if (Str::startsWith($file_url, 'cid://')) {
                 $payload = $this->makeMimePackage();
             }
-            // add a ReturnJMF so we can find out how things went
-            $this->root->Command->QueueSubmissionParams->addAttribute('ReturnJMF', route('joe-pritchard.return-jmf'));
-
         }
-
 
         $curl_handle = curl_init($target);
         curl_setopt($curl_handle, CURLOPT_POST, 1);
@@ -104,16 +111,17 @@ class JMF extends BaseJDF
         if ($raw_result === false) {
             throw new JMFSubmissionException('Failed to communicate with the JMF server');
         }
-
         try {
             $result = new SimpleXMLElement($raw_result);
         } catch (\Exception $exception) {
             throw new JMFResponseException('The JMF server responded with Invalid XML: ' . $raw_result);
         }
-
         if ((int)$result->attributes()->ReturnCode > 0) {
             throw new JMFReturnCodeException((string)$result->Notification->Comment);
         }
+
+        Log::debug($payload);
+        Log::debug($result->Response->asXML());
 
         return $result->Response;
     }

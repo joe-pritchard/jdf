@@ -16,7 +16,7 @@ use Event;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use JoePritchard\JDF\Events\QueueEntrySubmitted;
+use JoePritchard\JDF\Events\JMFEntrySubmitted;
 use JoePritchard\JDF\Exceptions\JMFSubmissionException;
 use JoePritchard\JDF\Exceptions\WorkflowNotFoundException;
 use Storage;
@@ -136,14 +136,12 @@ class Manager
     {
         if ($this->available_workflows->where('name', $workflow_name)->count() > 0) {
             // we've already been told about this workflow, so answer from memory
-            echo $workflow_name . 'exists, I asked already' . PHP_EOL;
             return true;
         }
 
         $jmf = new JMF;
 
         $jmf->query()->addAttribute('Type', 'KnownControllers');
-        $jmf->query()->addAttribute('ID', Hash::make(time()));
 
         $response = $jmf->submitMessage();
 
@@ -179,12 +177,12 @@ class Manager
 
         $jmf->command()->addAttribute('Type', 'SubmitQueueEntry');
         $jmf->command()->addAttribute('xsi:type', 'CommandSubmitQueueEntry', 'xsi');
-        $jmf->command()->addAttribute('ID', Str::random());
         $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
+        $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('ReturnJMF', route('joe-pritchard.return-jmf'));
 
         $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
 
         // fire an event so the application can pick up on this response
-        Event::fire(new QueueEntrySubmitted($jmf->getMessage(), $response));
+        Event::fire(new JMFEntrySubmitted($jmf->getMessage(), $response));
     }
 }

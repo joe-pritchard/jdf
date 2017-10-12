@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
- * QueueEntrySubmittedListener.php
+ * JMFEntrySubmittedListener.php
  *
  * @project  jdf.git
  * @category JoePritchard\JDF\Listeners
@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace JoePritchard\JDF\Listeners;
 
-use JoePritchard\JDF\Events\QueueEntrySubmitted;
+use JoePritchard\JDF\Events\JMFEntrySubmitted;
 
 
 /**
- * Class QueueEntrySubmittedListener
+ * Class JMFEntrySubmittedListener
  *
  * @package JoePritchard\JDF\Listeners
  */
-class QueueEntrySubmittedListener
+class JMFEntrySubmittedListener
 {
     /**
      * If you provided me with a callback class
@@ -30,7 +30,7 @@ class QueueEntrySubmittedListener
     private $callback = null;
 
     /**
-     * QueueEntrySubmittedListener constructor. Initialise the callback class if provided
+     * JMFEntrySubmittedListener constructor. Initialise the callback class if provided
      */
     public function __construct()
     {
@@ -42,9 +42,9 @@ class QueueEntrySubmittedListener
     /**
      * Pass the event up the chain to your callback, if the handle method is defined
      *
-     * @param QueueEntrySubmitted $event
+     * @param JMFEntrySubmitted $event
      */
-    public function handle(QueueEntrySubmitted $event): void
+    public function handle(JMFEntrySubmitted $event): void
     {
         if ($this->callback !== null && method_exists($this->callback, 'handle')) {
             $this->callback->handle($event);

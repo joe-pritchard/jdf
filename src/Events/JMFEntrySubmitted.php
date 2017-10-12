@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
- * QueueEntrySubmitted.php
+ * JMFEntrySubmittedhp
  *
  * @project  jdf.git
  * @category JoePritchard\JDF\Events
@@ -15,11 +15,11 @@ namespace JoePritchard\JDF\Events;
 
 
 /**
- * Class QueueEntrySubmitted. Fires when a new JDF file is submitted to the JMF server
+ * Class JMFEntrySubmitted. Fires when a new JDF file is submitted to the JMF server
  *
  * @package JoePritchard\JDF\Events
  */
-class QueueEntrySubmitted
+class JMFEntrySubmitted
 {
     /**
      * @var \SimpleXMLElement
