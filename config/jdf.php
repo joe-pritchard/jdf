@@ -38,4 +38,16 @@ return [
     */
 
     'sender_id' => '',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Submit Queue Entry Callback
+    |--------------------------------------------------------------------------
+    |
+    | The fully qualified name of a listener you would like me to call whenever
+    | a JMF message is submitted successfully. Alternatively you could simply
+    | listen for the JoePritchard\JDF\QueueEntrySubmitted event in your app
+    */
+
+    'submit_queue_entry_callback' => null,
 ];

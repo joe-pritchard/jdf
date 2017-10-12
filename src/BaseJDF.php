@@ -93,6 +93,16 @@ class BaseJDF
     }
 
     /**
+     * Get the JMF or JDF message as a SimpleXMLElement
+     *
+     * @return SimpleXMLElement
+     */
+    public function getMessage(): \SimpleXMLElement
+    {
+        return $this->root;
+    }
+
+    /**
      * Get the raw jdf or jmf message as xml
      *
      * @return string

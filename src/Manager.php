@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace JoePritchard\JDF;
 
+use Event;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use JoePritchard\JDF\Events\QueueEntrySubmitted;
 use JoePritchard\JDF\Exceptions\JMFSubmissionException;
 use JoePritchard\JDF\Exceptions\WorkflowNotFoundException;
 use Storage;
@@ -181,5 +183,8 @@ class Manager
         $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
 
         $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
+
+        // fire an event so the application can pick up on this response
+        Event::fire(new QueueEntrySubmitted($jmf->getMessage(), $response));
     }
 }
