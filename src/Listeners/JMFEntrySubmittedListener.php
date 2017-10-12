@@ -35,7 +35,8 @@ class JMFEntrySubmittedListener
     public function __construct()
     {
         if (class_exists(config('jdf.submit_queue_entry_callback'))) {
-            $this->callback = new (config('jdf.submit_queue_entry_callback'));
+            $class_name     = config('jdf.submit_queue_entry_callback');
+            $this->callback = new $class_name;
         }
     }
 
