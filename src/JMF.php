@@ -118,7 +118,7 @@ class JMF extends BaseJDF
             throw new JMFResponseException('The JMF server responded with Invalid XML: ' . $raw_result);
         }
         if ((int)$result->Response->attributes()->ReturnCode > 0) {
-            throw new JMFReturnCodeException((string)$result->Notification->Comment);
+            throw new JMFReturnCodeException((string)$result->Response->Notification->Comment);
         }
 
         Log::debug($result->Response->asXML());
