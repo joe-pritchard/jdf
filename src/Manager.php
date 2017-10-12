@@ -177,8 +177,9 @@ class Manager
 
         $jmf->command()->addAttribute('Type', 'SubmitQueueEntry');
         $jmf->command()->addAttribute('xsi:type', 'CommandSubmitQueueEntry', 'xsi');
-        $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
-        $jmf->command()->addChild('QueueSubmissionParams')->addAttribute('ReturnJMF', route('joe-pritchard.return-jmf'));
+        $queue_submission_params = $jmf->command()->addChild('QueueSubmissionParams');
+        $queue_submission_params->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
+        $queue_submission_params->addAttribute('ReturnJMF', route('joe-pritchard.return-jmf'));
 
         $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
 
