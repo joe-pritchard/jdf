@@ -50,4 +50,30 @@ return [
     */
 
     'submit_queue_entry_callback' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Enable Return JMF
+    |--------------------------------------------------------------------------
+    |
+    | Do you want to enable ReturnJMF? If enabled, we will ask the JMF server
+    | to send us status updates for all jobs we submit via SubmitQueueEntry
+    | Either way you will continue to receive job status via the callback
+    |
+    */
+
+    'enable-return-jmf' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Return JMF URL
+    |--------------------------------------------------------------------------
+    |
+    | The URL we will ask the JMF server to send status updates to. If ReturnJMF
+    | is enabled, we will prefer this URL and fall back to our internal route,
+    | which is accessible at /jmf/return-jmf
+    |
+    */
+
+    'return-jmf-url' => null,
 ];
