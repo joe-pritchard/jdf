@@ -17,6 +17,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use JoePritchard\JDF\Events\JMFEntrySubmitted;
+use JoePritchard\JDF\Exceptions\JMFReturnCodeException;
 use JoePritchard\JDF\Exceptions\JMFSubmissionException;
 use JoePritchard\JDF\Exceptions\WorkflowNotFoundException;
 use Storage;
@@ -179,11 +180,86 @@ class Manager
         $jmf->command()->addAttribute('xsi:type', 'CommandSubmitQueueEntry', 'xsi');
         $queue_submission_params = $jmf->command()->addChild('QueueSubmissionParams');
         $queue_submission_params->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
-        $queue_submission_params->addAttribute('ReturnJMF', route('joe-pritchard.return-jmf'));
+        $queue_submission_params->addAttribute('ReturnJMF', config('jdf.return-jmf-url') ?? route('joe-pritchard.return-jmf'));
 
-        $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
+        $message  = $jmf->getMessage();
+
+        try {
+            $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
+        } catch (JMFReturnCodeException $exception) {
+            throw $exception;
+        }
 
         // fire an event so the application can pick up on this response
-        Event::fire(new JMFEntrySubmitted($jmf->getMessage(), $response));
+        Event::fire(new JMFEntrySubmitted($message, $response));
+    }
+
+    /**
+     * Get jobs from the JMF server.
+     *
+     * @param array $filters array of filter attributes, as follows:
+     * @internal param string $device Specify the device to get only jobs on a certain workflow/controller
+     * @internal param string $status Specify to get only jobs in a certain status. Must be 'Completed', 'InProgress', 'Suspended', or 'Aborted'
+     * @internal param int $job_id
+     *
+     * @return Collection
+     */
+    public function getJobs(array $filters = []): \Illuminate\Support\Collection
+    {
+        $jmf  = new JMF();
+        $jobs = new Collection;
+
+        // todo: actually use the device filter
+        $device = isset($filters['device']) ? $filters['device'] : '';
+        $status = isset($filters['status']) ? $filters['status'] : '';
+        $job_id = isset($filters['job_id']) ? (int)$filters['job_id'] : 0;
+
+        $jmf->query()->addAttribute('Type', 'QueueStatus');
+        $jmf->query()->addAttribute('xsi:type', 'QueryQueueStatus', 'xsi');
+
+        $queue_filter = $jmf->query()->addChild('QueueFilter');
+        $queue_filter->addAttribute('QueueEntryDetails', 'Brief');
+
+        if ($status !== '' && !in_array($status, ['Completed', 'InProgress', 'Suspended', 'Aborted'])) {
+            // silently ignore invalid statuses
+            return $jobs;
+        }
+        if ($status !== '') {
+            // StatusList only supports one status (despite its name)
+            $queue_filter->addAttribute('StatusList', $status);
+        }
+        if ($job_id > 0) {
+            $queue_entry_def = $queue_filter->addChild('QueueEntryDef');
+            $queue_entry_def->addAttribute('QueueEntryID', (string)$job_id);
+        }
+
+        $response = $jmf->submitMessage();
+
+        foreach ($response->Queue as $queue) {
+            foreach ($response->Queue->QueueEntry as $queue_entry) {
+                $jobs->push([
+                    'DeviceID'       => (string)$queue->attributes()->DeviceID,
+                    'QueueEntryID'   => (string)$queue_entry->attributes()->QueueEntryID,
+                    'Status'         => (string)$queue_entry->attributes()->Status,
+                    'SubmissionTime' => (string)$queue_entry->attributes()->SubmissionTime,
+                    'StartTime'      => (string)$queue_entry->attributes()->StartTime,
+                    'EndTime'        => (string)$queue_entry->attributes()->EndTime,
+                ]);
+            }
+        }
+
+        return $jobs;
+    }
+
+    /**
+     * use getJobs to get one specific job and return first for convenience
+     *
+     * @param int $job_id
+     *
+     * @return array|null
+     */
+    public function getJobStatus(int $job_id)
+    {
+        return $this->getJobs(['job_id' => $job_id])->first();
     }
 }
