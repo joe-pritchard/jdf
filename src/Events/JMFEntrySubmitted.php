@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace JoePritchard\JDF\Events;
 
-
 /**
  * Class JMFEntrySubmitted. Fires when a new JDF file is submitted to the JMF server
  *
@@ -31,6 +30,12 @@ class JMFEntrySubmitted
      */
     public $jmf_response;
 
+    /**
+     * JMFEntrySubmitted constructor.
+     *
+     * @param \SimpleXMLElement $jmf_request
+     * @param \SimpleXMLElement $jmf_response
+     */
     public function __construct(\SimpleXMLElement $jmf_request, \SimpleXMLElement $jmf_response)
     {
         $this->jmf_response = $jmf_response;
