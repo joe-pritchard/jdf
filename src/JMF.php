@@ -61,7 +61,7 @@ class JMF extends BaseJDF
      * @throws JMFResponseException
      * @throws JMFReturnCodeException
      */
-    public function submitMessage($url = null): SimpleXMLElement
+    public function submitMessage($url = null, $initialise = false): SimpleXMLElement
     {
         // Make sure cURL is enabled
         if (!function_exists('curl_version')) {
@@ -106,9 +106,12 @@ class JMF extends BaseJDF
         $raw_result = curl_exec($curl_handle);
         curl_close($curl_handle);
 
-        $this->initialiseMessage('JMF');
-
         Log::debug($payload);
+
+        if ($initialise) {
+            $this->initialiseMessage('JMF');
+        }
+
         if ($raw_result === false) {
             throw new JMFSubmissionException('Failed to communicate with the JMF server');
         }
@@ -118,6 +121,7 @@ class JMF extends BaseJDF
             throw new JMFResponseException('The JMF server responded with Invalid XML: ' . $raw_result);
         }
         if ((int)$result->Response->attributes()->ReturnCode > 0) {
+            Log::debug($result->asXML());
             throw new JMFReturnCodeException((string)$result->Response->Notification->Comment);
         }
 
