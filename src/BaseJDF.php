@@ -76,7 +76,7 @@ class BaseJDF
         // Initialize the JMF or JDF root node
         $root = new SimpleXMLElement($xml_encoding . '<'.$type.'/>', LIBXML_NOEMPTYTAG);
         $root->addAttribute('xmlns', $xmlns);
-        $root->addAttribute('xmlns:xsi', $xmlns_xsi);
+        $root->addAttribute('xsi:xmlns', $xmlns_xsi, 'xsi');
         $root->addAttribute('SenderID', $this->sender_id);
         $root->addAttribute('Version', $version);
 
