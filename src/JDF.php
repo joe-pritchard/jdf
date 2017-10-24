@@ -98,7 +98,7 @@ class JDF extends BaseJDF
         // add a layout element and filespec for this document within the ResourcePool
         $found_layout_element = false;
         $layout_element       = $this->resourcePool()->LayoutElement;
-        $file_path_for_jdf    = $this->formatPrintFilePath('MAX Default Source File Location/Doppelganger_Pdfs/' . $file_name);
+        $file_path_for_jdf    = $this->formatPrintFilePath($file_name);
 
         if ($layout_element->asXML() !== false) {
             // there are already LayoutElements, so check if one exists with a URL attribute equal to the file_name we're adding
