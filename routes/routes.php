@@ -10,10 +10,8 @@ declare(strict_types=1);
  *
  */
 
-Route::get('/jmf/return-jmf', function () {
-    foreach(Request::all() as $key => $value) {
-        $string = $key . ': ' . $value . PHP_EOL;
-    }
-
-    Log::debug('got return jmf: ' . PHP_EOL);
-})->name('joe-pritchard.return-jmf');
+if (config('jdf.enable-return-jmf') && !config('jdf.return-jmf-url')) {
+    Route::get('/jmf/return-jmf', function () {
+        // todo: return jmf route
+    })->name('joe-pritchard.return-jmf');
+}
