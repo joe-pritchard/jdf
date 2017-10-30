@@ -146,17 +146,19 @@ class BaseJDF
     {
         $remote_path = $file_name;
 
-        if (!Str::startsWith($remote_path, ['http://', 'https://', '\\\\', 'cid://'])) {
+        if (!Str::startsWith($remote_path, ['http://', 'https://', '\\\\', '//', 'cid://'])) {
             // this must be a local file, make it relative to the JMF server
 
             // strip off the leading file protocol string if present
-            $remote_path = Str::after($remote_path, 'file:///');
+            $remote_path = Str::after($remote_path, 'file://');
 
-            // prepend the file protocol and JMF server's base file path
-            $remote_path = 'file:///' . $this->server_file_path . $remote_path;
-        } elseif (Str::startsWith($remote_path, '\\\\')) {
-            // files on shares get the file:// prefix too, but not the server's local path
-            $remote_path = 'file:///' . $remote_path;
+            // prepend the JMF server's base file path
+            $remote_path = $this->server_file_path . $remote_path;
+
+            // prepend the file protocol back on, but not if we already prepended a network share path
+            if (!Str::startsWith($this->server_file_path, ['//', '\\\\'])) {
+                $remote_path = 'file://' . $remote_path;
+            }
         }
 
         return $remote_path;
