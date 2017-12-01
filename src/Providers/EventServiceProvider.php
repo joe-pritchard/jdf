@@ -15,7 +15,9 @@ namespace JoePritchard\JDF\Providers;
 
 use Event;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use JoePritchard\JDF\Events\JMFEntryFailed;
 use JoePritchard\JDF\Events\JMFEntrySubmitted;
+use JoePritchard\JDF\Listeners\JMFEntryFailedListener;
 use JoePritchard\JDF\Listeners\JMFEntrySubmittedListener;
 
 
@@ -34,5 +36,6 @@ class EventServiceProvider extends ServiceProvider
         parent::boot();
 
         Event::listen(JMFEntrySubmitted::class, JMFEntrySubmittedListener::class);
+        Event::listen(JMFEntryFailed::class, JMFEntryFailedListener::class);
     }
 }

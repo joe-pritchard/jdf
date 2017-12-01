@@ -16,7 +16,9 @@ use Event;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use JoePritchard\JDF\Events\JMFEntryFailed;
 use JoePritchard\JDF\Events\JMFEntrySubmitted;
+use JoePritchard\JDF\Exceptions\JMFResponseException;
 use JoePritchard\JDF\Exceptions\JMFReturnCodeException;
 use JoePritchard\JDF\Exceptions\JMFSubmissionException;
 use JoePritchard\JDF\Exceptions\WorkflowNotFoundException;
@@ -187,6 +189,13 @@ class Manager
         try {
             $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
         } catch (JMFReturnCodeException $exception) {
+            Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
+            throw $exception;
+        } catch (JMFSubmissionException $exception) {
+            Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
+            throw $exception;
+        } catch (JMFResponseException $exception) {
+            Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
             throw $exception;
         }
 
