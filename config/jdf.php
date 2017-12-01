@@ -53,6 +53,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Failed Queue Entry Callback
+    |--------------------------------------------------------------------------
+    |
+    | The fully qualified name of a listener you would like me to call whenever
+    | a JMF message fails to be submitted. Alternatively you could simply
+    | listen for the JoePritchard\JDF\JMFEntryFailed event in your app
+    */
+
+    'failed_queue_entry_callback' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Enable Return JMF
     |--------------------------------------------------------------------------
     |
