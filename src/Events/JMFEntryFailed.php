@@ -26,9 +26,9 @@ class JMFEntryFailed
     public $jmf_request;
 
     /**
-     * @var \SimpleXMLElement
+     * @var string
      */
-    public $jmf_response;
+    public $error_message;
 
     /**
      * JMFEntryFailed constructor.
