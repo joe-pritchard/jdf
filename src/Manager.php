@@ -261,14 +261,16 @@ class Manager
     }
 
     /**
-     * use getJobs to get one specific job and return first for convenience
+     * Use getJobs to get one specific job
+     * Returns a collection of arrays because JMF controller may return more than one entry for a certain job ID
+     * (for example if you grouped multiple files into one submission)
      *
      * @param int $job_id
      *
-     * @return array|null
+     * @return Collection
      */
     public function getJobStatus(int $job_id)
     {
-        return $this->getJobs(['job_id' => $job_id])->first();
+        return $this->getJobs(['job_id' => $job_id]);
     }
 }
