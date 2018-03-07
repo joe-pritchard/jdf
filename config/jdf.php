@@ -74,7 +74,7 @@ return [
     |
     */
 
-    'enable-return-jmf' => false,
+    'enable_return_jmf' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -87,5 +87,5 @@ return [
     |
     */
 
-    'return-jmf-url' => null,
+    'return_jmf_url' => null,
 ];

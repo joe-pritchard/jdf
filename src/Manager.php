@@ -182,7 +182,7 @@ class Manager
         $jmf->command()->addAttribute('xsi:type', 'CommandSubmitQueueEntry', 'xsi');
         $queue_submission_params = $jmf->command()->addChild('QueueSubmissionParams');
         $queue_submission_params->addAttribute('URL', $jmf->formatPrintFilePath($file_url));
-        $queue_submission_params->addAttribute('ReturnJMF', config('jdf.return-jmf-url') ?? route('joe-pritchard.return-jmf'));
+        $queue_submission_params->addAttribute('ReturnJMF', config('jdf.return_jmf_url') ?? route('joe-pritchard.return-jmf'));
 
         $message  = $jmf->getMessage();
 

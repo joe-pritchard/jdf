@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 /**
- * JMFEntrySubmittedhp
+ * JMFEntrySubmitted.php
  *
  * @project  jdf.git
  * @category JoePritchard\JDF\Events
