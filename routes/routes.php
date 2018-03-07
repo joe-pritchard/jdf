@@ -10,8 +10,10 @@ declare(strict_types=1);
  *
  */
 
-if (config('jdf.enable-return-jmf') && !config('jdf.return-jmf-url')) {
-    Route::get('/jmf/return-jmf', function () {
-        // todo: return jmf route
+use Illuminate\Http\Request;
+
+if (config('jdf.enable_return_jmf') && !config('jdf.return_jmf_url', false)) {
+    Route::post('/jmf/return-jmf', function (Request $request) {
+        event(new \JoePritchard\JDF\Events\ReturnJMFReceived($request->all()));
     })->name('joe-pritchard.return-jmf');
 }
