@@ -19,7 +19,8 @@
   "require": {
     "php": "^7.0",
     "ext-curl": "*",
-    "illuminate/support": "~5.0"
+    "laravel/framework": "^5.0"
+    "laravel/framework": "^5.0"
   },
   "require-dev": {
   },
