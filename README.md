@@ -15,4 +15,8 @@ the status of its jobs.
 `composer require joe-pritchard/jdf`
 
 ## Usage ##
+
+**Create a new JDF file**
+
+`$jdf = new JDF();`
  
