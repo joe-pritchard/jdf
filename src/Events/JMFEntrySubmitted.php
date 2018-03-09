@@ -21,12 +21,12 @@ namespace JoePritchard\JDF\Events;
 class JMFEntrySubmitted
 {
     /**
-     * @var \SimpleXMLElement
+     * @var string
      */
     public $jmf_request;
 
     /**
-     * @var \SimpleXMLElement
+     * @var string
      */
     public $jmf_response;
 
@@ -38,7 +38,7 @@ class JMFEntrySubmitted
      */
     public function __construct(\SimpleXMLElement $jmf_request, \SimpleXMLElement $jmf_response)
     {
-        $this->jmf_response = $jmf_response;
-        $this->jmf_request  = $jmf_request;
+        $this->jmf_response = $jmf_response->asXML();
+        $this->jmf_request  = $jmf_request->asXML();
     }
 }

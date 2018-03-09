@@ -21,7 +21,7 @@ namespace JoePritchard\JDF\Events;
 class JMFEntryFailed
 {
     /**
-     * @var \SimpleXMLElement
+     * @var string
      */
     public $jmf_request;
 
@@ -39,6 +39,6 @@ class JMFEntryFailed
     public function __construct(\SimpleXMLElement $jmf_request, string $error_message)
     {
         $this->error_message = $error_message;
-        $this->jmf_request   = $jmf_request;
+        $this->jmf_request   = $jmf_request->asXML();
     }
 }
