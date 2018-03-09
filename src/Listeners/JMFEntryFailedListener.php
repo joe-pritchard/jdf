@@ -34,7 +34,7 @@ class JMFEntryFailedListener
      */
     public function __construct()
     {
-        if (class_exists(config('jdf.failed_queue_entry_callback'))) {
+        if (class_exists(config('jdf.failed_queue_entry_callback', ''))) {
             $class_name     = config('jdf.failed_queue_entry_callback');
             $this->callback = new $class_name;
         }
