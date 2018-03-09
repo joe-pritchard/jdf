@@ -49,7 +49,7 @@ return [
     | listen for the JoePritchard\JDF\JMFEntrySubmitted event in your app
     */
 
-    'submit_queue_entry_callback' => null,
+    'submit_queue_entry_callback' => '',
 
     /*
     |--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ return [
     | listen for the JoePritchard\JDF\JMFEntryFailed event in your app
     */
 
-    'failed_queue_entry_callback' => null,
+    'failed_queue_entry_callback' => '',
 
     /*
     |--------------------------------------------------------------------------
