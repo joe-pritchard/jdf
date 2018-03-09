@@ -127,7 +127,7 @@ class JMF extends BaseJDF
 
         Log::debug($result->Response->asXML());
 
-        return $result->Response;
+        return $result;
     }
 
     /**

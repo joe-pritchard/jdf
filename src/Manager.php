@@ -146,7 +146,7 @@ class Manager
 
         $jmf->query()->addAttribute('Type', 'KnownControllers');
 
-        $response = $jmf->submitMessage();
+        $response = $jmf->submitMessage()->Response;
 
         foreach ($response->JDFController as $controller) {
             $controller_id  = (string) $controller->attributes()->ControllerID;
@@ -242,7 +242,7 @@ class Manager
             $queue_entry_def->addAttribute('QueueEntryID', (string)$job_id);
         }
 
-        $response = $jmf->submitMessage();
+        $response = $jmf->submitMessage()->Response;
 
         foreach ($response->Queue as $queue) {
             foreach ($response->Queue->QueueEntry as $queue_entry) {
