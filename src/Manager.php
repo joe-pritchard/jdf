@@ -246,8 +246,13 @@ class Manager
 
         foreach ($response->Queue as $queue) {
             foreach ($response->Queue->QueueEntry as $queue_entry) {
+                if ($device !== '' && !urldecode((string)$queue->attributes()->DeviceID) !== $device) {
+                    // if a device filter was specified, skip any entries that do not match the filter
+                    continue;
+                }
+
                 $jobs->push([
-                    'DeviceID'       => (string)$queue->attributes()->DeviceID,
+                    'DeviceID'       => urldecode((string)$queue->attributes()->DeviceID),
                     'QueueEntryID'   => (string)$queue_entry->attributes()->QueueEntryID,
                     'Status'         => (string)$queue_entry->attributes()->Status,
                     'SubmissionTime' => (string)$queue_entry->attributes()->SubmissionTime,
