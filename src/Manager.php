@@ -241,16 +241,14 @@ class Manager
             $queue_entry_def = $queue_filter->addChild('QueueEntryDef');
             $queue_entry_def->addAttribute('QueueEntryID', (string)$job_id);
         }
+        if ($device !== '') {
+            $jmf->setDevice($device);
+        }
 
         $response = $jmf->submitMessage()->Response;
 
         foreach ($response->Queue as $queue) {
-            foreach ($response->Queue->QueueEntry as $queue_entry) {
-                if ($device !== '' && !urldecode((string)$queue->attributes()->DeviceID) !== $device) {
-                    // if a device filter was specified, skip any entries that do not match the filter
-                    continue;
-                }
-
+            foreach ($queue->QueueEntry as $queue_entry) {
                 $jobs->push([
                     'DeviceID'       => urldecode((string)$queue->attributes()->DeviceID),
                     'QueueEntryID'   => (string)$queue_entry->attributes()->QueueEntryID,
