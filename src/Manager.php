@@ -14,6 +14,7 @@ namespace JoePritchard\JDF;
 
 use Event;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use JoePritchard\JDF\Events\JMFEntryFailed;
@@ -142,28 +143,23 @@ class Manager
             return true;
         }
 
-        $jmf = new JMF;
-
-        $jmf->query()->addAttribute('Type', 'KnownControllers');
-
-        $response = $jmf->submitMessage()->Response;
-
-        foreach ($response->JDFController as $controller) {
-            $controller_id  = (string) $controller->attributes()->ControllerID;
-            $controller_url = (string) $controller->attributes()->URL;
-
-            // remember this in case we can save time later by getting it straight out of the collection
-            if ($this->available_workflows->where('name', $workflow_name)->count() === 0) {
-                $this->available_workflows->push(collect(['name' => $controller_id, 'url' => $controller_url]));
-            }
-
-            if ($controller_id === $workflow_name) {
-                // This controller matches!
-                return true;
+        if (config('jdf.cache_controllers', false)) {
+            $workflows = Cache::remember('jdf.workflows', 120, function () {
+                return self::getWorkflows();
+            });
+        } else {
+            try {
+                $workflows = self::getWorkflows();
+            } catch (JMFResponseException $e) {
+                return false;
+            } catch (JMFReturnCodeException $e) {
+                return false;
+            } catch (JMFSubmissionException $e) {
+                return false;
             }
         }
 
-        return false;
+        return $workflows->where('name', $workflow_name)->count() > 0;
     }
 
     /**
@@ -190,17 +186,42 @@ class Manager
             $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
         } catch (JMFReturnCodeException $exception) {
             Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
-            throw $exception;
         } catch (JMFSubmissionException $exception) {
             Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
-            throw $exception;
         } catch (JMFResponseException $exception) {
             Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
-            throw $exception;
         }
 
         // fire an event so the application can pick up on this response
         Event::fire(new JMFEntrySubmitted($message, $response));
+    }
+
+    /**
+     * Get all workflows from the controller
+     * @static function getWorkflows
+     * @return Collection
+     * @throws JMFResponseException
+     * @throws JMFReturnCodeException
+     * @throws JMFSubmissionException
+     */
+    private static function getWorkflows(): Collection
+    {
+        $workflows = new Collection;
+
+        $jmf = new JMF;
+        $jmf->query()->addAttribute('Type', 'KnownControllers');
+
+        $response = $jmf->submitMessage()->Response;
+
+        foreach ($response->JDFController as $controller) {
+            $controller_id = (string)$controller->attributes()->ControllerID;
+            $controller_url = (string)$controller->attributes()->URL;
+            if ($workflows->where('name', $controller_id)->count() === 0) {
+                $workflows->push(collect(['name' => $controller_id, 'url' => $controller_url]));
+            }
+        }
+
+        return $workflows;
     }
 
     /**

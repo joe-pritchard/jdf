@@ -88,4 +88,18 @@ return [
     */
 
     'return_jmf_url' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Controllers
+    |--------------------------------------------------------------------------
+    |
+    | If enabled, we will cache the result of each KnownControllers call
+    | (often called queues or workflows) that we make to the controller
+    | using your default cache driver. The cache will last 2 hours.
+    |
+    */
+
+    'cache_controllers' => false,
+
 ];
