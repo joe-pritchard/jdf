@@ -68,7 +68,9 @@ $jdf_manager->sendJDFFile('http://absolute/path/to/filename.jdf')->toDestination
 
 To a specific controller (either to override the default or if you haven't specified a URL in your config file):
 
-```//This can't currently be done :(```
+```
+//This can't currently be done :(
+```
 
 **Get job status from a controller**
 
