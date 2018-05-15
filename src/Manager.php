@@ -186,10 +186,13 @@ class Manager
             $response = $jmf->setDevice($workflow->get('name'))->submitMessage();
         } catch (JMFReturnCodeException $exception) {
             Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
+            return;
         } catch (JMFSubmissionException $exception) {
             Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
+            return;
         } catch (JMFResponseException $exception) {
             Event::fire(new JMFEntryFailed($message, $exception->getMessage()));
+            return;
         }
 
         // fire an event so the application can pick up on this response
