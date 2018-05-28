@@ -75,6 +75,7 @@ class JDF extends BaseJDF
      */
     public function setCustomerInfo(array $customer_info_parameters)
     {
+        /** @var \SimpleXMLElement $customer_info */
         $customer_info = $this->resourcePool()->CustomerInfo ?? $this->resourcePool()->addChild('CustomerInfo');
 
         foreach ($customer_info_parameters as $parament_name => $parameter_value) {
@@ -82,8 +83,10 @@ class JDF extends BaseJDF
         }
 
         // add an ID to the customer info node so we can link it, and then link it!
-        $customer_info->addAttribute('ID', 'CI1');
-        $this->linkResource('CustomerInfo','Input');
+        if ($customer_info->attributes()->ID === null) {
+            $customer_info->addAttribute('ID', 'CI1');
+            $this->linkResource('CustomerInfo','Input');
+        }
 
         return $this;
     }
