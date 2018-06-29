@@ -209,22 +209,24 @@ class Manager
      */
     private static function getWorkflows(): Collection
     {
-        $workflows = new Collection;
+        return cache()->remember('joe-pritchard.jdf.workflows', 60, function() {
+            $workflows = new Collection;
 
-        $jmf = new JMF;
-        $jmf->query()->addAttribute('Type', 'KnownControllers');
+            $jmf = new JMF;
+            $jmf->query()->addAttribute('Type', 'KnownControllers');
 
-        $response = $jmf->submitMessage()->Response;
+            $response = $jmf->submitMessage()->Response;
 
-        foreach ($response->JDFController as $controller) {
-            $controller_id = (string)$controller->attributes()->ControllerID;
-            $controller_url = (string)$controller->attributes()->URL;
-            if ($workflows->where('name', $controller_id)->count() === 0) {
-                $workflows->push(collect(['name' => $controller_id, 'url' => $controller_url]));
+            foreach ($response->JDFController as $controller) {
+                $controller_id = (string)$controller->attributes()->ControllerID;
+                $controller_url = (string)$controller->attributes()->URL;
+                if ($workflows->where('name', $controller_id)->count() === 0) {
+                    $workflows->push(collect(['name' => $controller_id, 'url' => $controller_url]));
+                }
             }
-        }
 
-        return $workflows;
+            return $workflows;
+        });
     }
 
     /**
