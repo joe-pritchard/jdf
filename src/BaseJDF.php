@@ -155,8 +155,8 @@ class BaseJDF
             // prepend the JMF server's base file path
             $remote_path = $this->server_file_path . $remote_path;
 
-            // prepend the file protocol back on, but not if we already prepended a network share path
-            if (!Str::startsWith($this->server_file_path, ['//', '\\\\'])) {
+            // prepend the file protocol back on, but not if we already prepended a protocol string in the server path config option
+            if (!Str::startsWith($this->server_file_path, ['//', '\\\\', 'http:', 'https:', 'file:'])) {
                 $remote_path = 'file://' . $remote_path;
             }
         }
